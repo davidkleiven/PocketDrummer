@@ -3,18 +3,22 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 const SwitchButton = props => {
     return (
+        <View style={{...styles.button, ...props.style}}>
         <TouchableOpacity onPress={props.onPress}>
-            <View style={{...styles.button, ...props.style}}>
                 <Text style={{...styles.text}}>{props.title}</Text>
-            </View>
         </TouchableOpacity>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     button: {
+        flex: 1,
         backgroundColor: '#474b4f',
-        padding: 20,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: 2,
+        paddingBottom: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
