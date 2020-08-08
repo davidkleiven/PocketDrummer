@@ -2,9 +2,31 @@ import React, { useState } from 'react';
 import { Text, View, Button, StyleSheet } from 'react-native';
 import SwitchButton from './components/switchButton';
 import {HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR} from './constants';
+import DocumentPicker from 'react-native-document-picker';
 
 function switchBtnColor(indicator) {
   return indicator ? HIGHLIGHT_COLOR : DEFAULT_BUTTON_COLOR
+}
+
+async function selectRythmFile(stateSetter) {
+  try {
+    const res = await DocumentPicker.pick({
+      type: [DocumentPicker.types.zip],
+    });
+    stateSetter(res)
+    console.log(
+      res.uri,
+      res.type, // mime type
+      res.name,
+      res.size
+    );
+  } catch (err) {
+    if (DocumentPicker.isCancel(err)) {
+      // User cancelled the picker, exit any dialogs or menus and move on
+    } else {
+      throw err;
+    }
+  }
 }
 
 const PocketDrummerApp = () => {
@@ -18,6 +40,11 @@ const PocketDrummerApp = () => {
 
   return (
     <View style={{...styles.container}}>
+      <View style={{...styles.rowContainer}}>
+        <View style={{...styles.buttonContainer}}>
+          <SwitchButton title="Select beat" onPress={() => selectRythmFile(setRythmFile)}/>
+        </View>
+      </View>
 
 <View style={{...styles.rowContainer}}>
         <View style={{...styles.buttonContainer}}>
