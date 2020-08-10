@@ -19,6 +19,7 @@ class PatchSwitch {
         this.endRequested = false
         this.tracks = null
         this.fillInProgress = false
+        this.currentURI = ''
     }
 
     mainTrack() {
@@ -75,7 +76,9 @@ class PatchSwitch {
 
     async start() {
         try {
-            await this.loadRythm()
+            if (this.currentURI !== this.uiprops.rythm.value.uri) {
+                await this.loadRythm()
+            }
         } catch (err) {
             this.uiprops.status.setter("Could not load rythm")
             this.stop()
