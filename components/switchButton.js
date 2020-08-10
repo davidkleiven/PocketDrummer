@@ -3,11 +3,9 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 const SwitchButton = props => {
     return (
-        <View style={{...styles.button, ...props.style}}>
-        <TouchableOpacity onPress={props.onPress}>
+        <TouchableOpacity onPress={props.onPress} style={{...styles.button, ...props.style}}>
                 <Text style={{...styles.text}}>{props.title}</Text>
         </TouchableOpacity>
-        </View>
     );
 };
 
