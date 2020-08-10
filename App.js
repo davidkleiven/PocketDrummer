@@ -117,7 +117,7 @@ const PocketDrummerApp = () => {
         </View>
       </View>
  
-      {/* <View style={{ ...styles.rowContainer }}>
+      <View style={{ ...styles.rowContainer }}>
         <View style={{ ...styles.buttonContainer }}>
           <SwitchButton title="Var 1" style={{ backgroundColor: switchBtnColor(variation === 0) }}
             onPress={() => setVariation(0)} />
@@ -126,7 +126,7 @@ const PocketDrummerApp = () => {
           <SwitchButton title="Var 2" style={{ backgroundColor: switchBtnColor(variation === 1) }}
             onPress={() => setVariation(1)} />
         </View>
-      </View> */}
+      </View>
 
     </View>
   );

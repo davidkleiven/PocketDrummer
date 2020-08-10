@@ -19,13 +19,12 @@ class PatchSwitch {
         this.endRequested = false
         this.tracks = null
         this.fillInProgress = false
+        this.currentURI = ''
     }
 
     mainTrack() {
         const f = this.tracks.folder
-        // TODO: Multiple variations are not yet supported
-        return f + this.tracks.var1.main
-        //return this.uiprops.variation === 0 ? f + this.tracks.var1.main : f + this.tracks.var2.main
+        return this.uiprops.variation === 0 ? f + this.tracks.var1.main : f + this.tracks.var2.main
     }
 
     fill1Track() {
@@ -42,6 +41,10 @@ class PatchSwitch {
         return this.tracks.folder + this.tracks.intro
     }
 
+    hasIntroTrack() {
+        return this.tracks.intro !== ''
+    }
+
     endTrack() {
         return this.tracks.folder + this.tracks.end
     }
@@ -52,6 +55,24 @@ class PatchSwitch {
 
     fillSetter(fillNo) {
         return fillNo === 0 ? this.uiprops.fill1.setter : this.uiprops.fill2.setter
+    }
+
+    hasFill1() {
+        const v = this.uiprops.variation
+        return v == 0 ? this.tracks.var1.fill1 !== '' : this.tracks.var2.fill1 !== ''
+    }
+
+    hasFill2() {
+        const v = this.uiprops.variation
+        return v == 0 ? this.tracks.var1.fill2 !== '' : this.tracks.var2.fill2 !== ''
+    }
+
+    hasFill(fillNo) {
+        return fillNo === 0 ? this.hasFill() : this.hasFill2()
+    }
+
+    hasEnd() {
+        return this.tracks.end !== ''
     }
 
     async loadRythm() {
@@ -77,7 +98,9 @@ class PatchSwitch {
 
     async start() {
         try {
-            await this.loadRythm()
+            if (this.currentURI !== this.uiprops.rythm.value.uri) {
+                await this.loadRythm()
+            }
         } catch (err) {
             this.uiprops.status.setter("Could not load rythm")
             this.stop()
@@ -86,7 +109,7 @@ class PatchSwitch {
 
         TrackPlayer.setupPlayer().then(async () => {
 
-            if (this.uiprops.intro.value && this.introTrack() !== '') {
+            if (this.uiprops.intro.value && this.hasIntroTrack()) {
                 await this.add({
                     id: INTRO,
                     url: this.introTrack()
@@ -115,7 +138,10 @@ class PatchSwitch {
                             case PATCH2:
                                 console.log("Requeing")
                                 TrackPlayer.remove(tr.id).then(
-                                    this.add(tr)
+                                    this.add({
+                                        id: tr.id,
+                                        url: this.mainTrack()
+                                    })
                                 )
                                 break;
                             case FILL1:
@@ -163,44 +189,37 @@ class PatchSwitch {
     }
 
     async fill(fillNo) {
-        if (this.fillInProgress || this.fillTrack(fillNo) === ''){
+        if (this.fillInProgress){
             return
         }
 
-        const trackId = fillNo === 0 ? FILL1 : FILL2
-        const queue = await TrackPlayer.getQueue()
-        const beforeId = queue[1].id
-        const d = await TrackPlayer.getDuration()
-        const p = await TrackPlayer.getPosition()
-        if ((d - p) > MIN_REQUEST_TIME) {
-            await this.add({
-                id: trackId,
-                url: this.fillTrack(fillNo),
-            }, beforeId)
-            this.fillInProgress = true
-        } else {
-            this.fillSetter(fillNo)(FILL_IDLE)
-            console.log("Fill rejected because query was too late")
+        console.log("NOT HAS FILL", !this.hasFill(fillNo))
+        if (!this.hasFill(fillNo)) {
+            setter = this.fillSetter(fillNo)
+            setter(FILL_IDLE)
+            return
         }
+
+        await this.add({
+            id: fillNo === 0 ? FILL1 : FILL2,
+            url: this.fillTrack(fillNo),
+        })
+        this.fillInProgress = true
     }
 
     async end() {
-        const queue = await TrackPlayer.getQueue()
-        const beforeId = queue[1].id
-        const d = await TrackPlayer.getDuration()
-        const p = await TrackPlayer.getPosition()
+
+        if (!this.hasEnd()) {
+            this.uiprops.end.setter(0)
+            return
+        }
+        
         const endTrack = {
             id: END,
             url: this.endTrack()
         }
-        
-        if (d - p > MIN_REQUEST_TIME) {
-            this.add(endTrack, beforeId).then(() => {
-                TrackPlayer.remove(beforeId)
-            })
-        } else {
-            this.add(endTrack)
-        }
+      
+        this.add(endTrack)
         this.endRequested = true
     }
 }
