@@ -41,6 +41,10 @@ class PatchSwitch {
         return this.tracks.folder + this.tracks.intro
     }
 
+    hasIntroTrack() {
+        return this.tracks.intro !== ''
+    }
+
     endTrack() {
         return this.tracks.folder + this.tracks.end
     }
@@ -51,6 +55,24 @@ class PatchSwitch {
 
     fillSetter(fillNo) {
         return fillNo === 0 ? this.uiprops.fill1.setter : this.uiprops.fill2.setter
+    }
+
+    hasFill1() {
+        const v = this.uiprops.variation
+        return v == 0 ? this.tracks.var1.fill1 !== '' : this.tracks.var2.fill1 !== ''
+    }
+
+    hasFill2() {
+        const v = this.uiprops.variation
+        return v == 0 ? this.tracks.var1.fill2 !== '' : this.tracks.var2.fill2 !== ''
+    }
+
+    hasFill(fillNo) {
+        return fillNo === 0 ? this.hasFill() : this.hasFill2()
+    }
+
+    hasEnd() {
+        return this.tracks.end !== ''
     }
 
     async loadRythm() {
@@ -87,7 +109,7 @@ class PatchSwitch {
 
         TrackPlayer.setupPlayer().then(async () => {
 
-            if (this.uiprops.intro.value && this.introTrack() !== '') {
+            if (this.uiprops.intro.value && this.hasIntroTrack()) {
                 await this.add({
                     id: INTRO,
                     url: this.introTrack()
@@ -167,7 +189,14 @@ class PatchSwitch {
     }
 
     async fill(fillNo) {
-        if (this.fillInProgress || this.fillTrack(fillNo) === ''){
+        if (this.fillInProgress){
+            return
+        }
+
+        console.log("NOT HAS FILL", !this.hasFill(fillNo))
+        if (!this.hasFill(fillNo)) {
+            setter = this.fillSetter(fillNo)
+            setter(FILL_IDLE)
             return
         }
 
@@ -179,6 +208,12 @@ class PatchSwitch {
     }
 
     async end() {
+
+        if (!this.hasEnd()) {
+            this.uiprops.end.setter(0)
+            return
+        }
+        
         const endTrack = {
             id: END,
             url: this.endTrack()

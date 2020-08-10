@@ -26,7 +26,7 @@ ExtractTracks = async (zipfile) => {
     }
 
     res = await unzip(zipfile, sourceDir)
-    console.log(res)
+    console.log("File unzipped to", res)
     
     infoPath = folder + '/info.json'
     content = await readFile(infoPath)
