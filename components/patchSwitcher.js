@@ -23,9 +23,7 @@ class PatchSwitch {
 
     mainTrack() {
         const f = this.tracks.folder
-        // TODO: Multiple variations are not yet supported
-        return f + this.tracks.var1.main
-        //return this.uiprops.variation === 0 ? f + this.tracks.var1.main : f + this.tracks.var2.main
+        return this.uiprops.variation === 0 ? f + this.tracks.var1.main : f + this.tracks.var2.main
     }
 
     fill1Track() {
@@ -115,7 +113,10 @@ class PatchSwitch {
                             case PATCH2:
                                 console.log("Requeing")
                                 TrackPlayer.remove(tr.id).then(
-                                    this.add(tr)
+                                    this.add({
+                                        id: tr.id,
+                                        url: this.mainTrack()
+                                    })
                                 )
                                 break;
                             case FILL1:
@@ -167,40 +168,20 @@ class PatchSwitch {
             return
         }
 
-        const trackId = fillNo === 0 ? FILL1 : FILL2
-        const queue = await TrackPlayer.getQueue()
-        const beforeId = queue[1].id
-        const d = await TrackPlayer.getDuration()
-        const p = await TrackPlayer.getPosition()
-        if ((d - p) > MIN_REQUEST_TIME) {
-            await this.add({
-                id: trackId,
-                url: this.fillTrack(fillNo),
-            }, beforeId)
-            this.fillInProgress = true
-        } else {
-            this.fillSetter(fillNo)(FILL_IDLE)
-            console.log("Fill rejected because query was too late")
-        }
+        await this.add({
+            id: fillNo === 0 ? FILL1 : FILL2,
+            url: this.fillTrack(fillNo),
+        })
+        this.fillInProgress = true
     }
 
     async end() {
-        const queue = await TrackPlayer.getQueue()
-        const beforeId = queue[1].id
-        const d = await TrackPlayer.getDuration()
-        const p = await TrackPlayer.getPosition()
         const endTrack = {
             id: END,
             url: this.endTrack()
         }
-        
-        if (d - p > MIN_REQUEST_TIME) {
-            this.add(endTrack, beforeId).then(() => {
-                TrackPlayer.remove(beforeId)
-            })
-        } else {
-            this.add(endTrack)
-        }
+      
+        this.add(endTrack)
         this.endRequested = true
     }
 }
