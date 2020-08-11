@@ -32,7 +32,7 @@ async function selectRythmFile(stateSetter, statusSetter) {
   }
 }
 
-const PocketDrummerApp = () => {
+const RhythmiFixApp = () => {
   const [beatIsRunning, isRunning] = useState(0);
   const [useIntro, setUseIntro] = useState(true);
   const [toEnd, setToEnd] = useState(0);
@@ -99,6 +99,17 @@ const PocketDrummerApp = () => {
             }} />
         </View>
       </View>
+ 
+      <View style={{ ...styles.rowContainer }}>
+        <View style={{ ...styles.buttonContainer }}>
+          <SwitchButton title="Var 1" style={{ backgroundColor: switchBtnColor(variation === 0) }}
+            onPress={() => setVariation(0)} />
+        </View>
+        <View style={{ ...styles.buttonContainer }}>
+          <SwitchButton title="Var 2" style={{ backgroundColor: switchBtnColor(variation === 1) }}
+            onPress={() => setVariation(1)} />
+        </View>
+      </View>
 
       <View style={{ ...styles.rowContainer }}>
         <View style={{ ...styles.buttonContainer }}>
@@ -114,17 +125,6 @@ const PocketDrummerApp = () => {
               setFill2(!fill2)
               player.fill(1)
             }} />
-        </View>
-      </View>
- 
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Var 1" style={{ backgroundColor: switchBtnColor(variation === 0) }}
-            onPress={() => setVariation(0)} />
-        </View>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Var 2" style={{ backgroundColor: switchBtnColor(variation === 1) }}
-            onPress={() => setVariation(1)} />
         </View>
       </View>
 
@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    padding: 10,
+    padding: 4
   }
 })
 
-export default PocketDrummerApp;
+export default RhythmiFixApp;

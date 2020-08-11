@@ -13,10 +13,6 @@ const styles = StyleSheet.create({
     button: {
         flex: 1,
         backgroundColor: '#474b4f',
-        paddingLeft: 10,
-        paddingRight: 10,
-        paddingTop: 2,
-        paddingBottom: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
