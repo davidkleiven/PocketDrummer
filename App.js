@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Text, View, Button, StyleSheet } from 'react-native';
+import { Text, View, Button, StyleSheet, Clipboard } from 'react-native';
 import SwitchButton from './components/switchButton';
-import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR } from './constants';
+import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR, EXAMPLE_LINK, WEBPAGE, SUPPORT_EMAIL } from './constants';
 import DocumentPicker from 'react-native-document-picker';
 
 import PatchSwitch from './components/patchSwitcher';
@@ -40,15 +40,15 @@ const RhythmiFixApp = () => {
   const [fill2, setFill2] = useState(0);
   const [variation, setVariation] = useState(0);
   const [rythmFile, setRythmFile] = useState();
-  const [status, setStatus] = useState("No file selected")
+  const [status, setStatus] = useState("No file selected. Click on \"Select beat\" to open a track!")
   let [player, setPlayer] = useState(new PatchSwitch({
     fill1: { setter: setFill1, value: fill1 },
     fill2: { setter: setFill2, value: fill2 },
     end: { setter: setToEnd, value: toEnd },
     startStop: { setter: isRunning, value: beatIsRunning },
     intro: { setter: setUseIntro, value: useIntro },
-    rythm: {setter: null, value: rythmFile},
-    status: {setter: setStatus, value: status},
+    rythm: { setter: null, value: rythmFile },
+    status: { setter: setStatus, value: status },
     variation: variation
   }))
 
@@ -59,72 +59,94 @@ const RhythmiFixApp = () => {
 
   return (
     <View style={{ ...styles.container }}>
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Select beat" onPress={() => selectRythmFile(setRythmFile, setStatus)} />
-        </View>
-      </View>
-      <View style={{ ...styles.rowContainer }}>
-        <Text style={{color: '#86c232'}}>{status}</Text>
-      </View>
-
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title={beatIsRunning ? "Stop" : "Start"} onPress={() => {
-            isRunning(!beatIsRunning)
-            if (!beatIsRunning) {
-              console.log("Playing song!")
-              player.start()
-
-            } else {
-              player.stop()
-            }
-          }} />
-        </View>
-      </View>
-
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Intro" style={{ backgroundColor: switchBtnColor(useIntro) }}
-            onPress={() => {
-              setUseIntro(!useIntro)
-            }
-            } />
-        </View>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="End" style={{ backgroundColor: switchBtnColor(toEnd) }}
-            onPress={() => {
-              setToEnd(!toEnd)
-              player.end()
+      <View style={{ flex: 1 }}>
+        <View style={{ ...styles.rowContainer }}>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Examples" onPress={() => {
+              Clipboard.setString(EXAMPLE_LINK)
+              setStatus("Link to Google Drive with example rhythms copied to clipboard")
             }} />
+          </View>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Webpage" onPress={() => {
+              Clipboard.setString(WEBPAGE)
+              setStatus("Link to GitHub webpage copied to clipboard")
+            }} />
+          </View>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Support" onPress={() => {
+              Clipboard.setString(SUPPORT_EMAIL)
+              setStatus("Email address for questions copied to clipboard")
+            }} />
+          </View>
         </View>
       </View>
- 
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Var 1" style={{ backgroundColor: switchBtnColor(variation === 0) }}
-            onPress={() => setVariation(0)} />
+      <View style={{ flex: 10 }}>
+        <View style={{ ...styles.rowContainer }}>
+          <Text style={{ color: '#86c232' }}>{status}</Text>
         </View>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Var 2" style={{ backgroundColor: switchBtnColor(variation === 1) }}
-            onPress={() => setVariation(1)} />
-        </View>
-      </View>
 
-      <View style={{ ...styles.rowContainer }}>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Fill 1" style={{ backgroundColor: switchBtnColor(fill1) }}
-            onPress={() => {
-              setFill1(!fill1)
-              player.fill(0)
+        <View style={{ ...styles.rowContainer }}>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Select beat" onPress={() => selectRythmFile(setRythmFile, setStatus)} />
+          </View>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title={beatIsRunning ? "Stop" : "Start"} onPress={() => {
+              isRunning(!beatIsRunning)
+              if (!beatIsRunning) {
+                console.log("Playing song!")
+                player.start()
+
+              } else {
+                player.stop()
+              }
             }} />
+          </View>
         </View>
-        <View style={{ ...styles.buttonContainer }}>
-          <SwitchButton title="Fill 2" style={{ backgroundColor: switchBtnColor(fill2) }}
-            onPress={() => {
-              setFill2(!fill2)
-              player.fill(1)
-            }} />
+
+        <View style={{ ...styles.rowContainer }}>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Intro" style={{ backgroundColor: switchBtnColor(useIntro) }}
+              onPress={() => {
+                setUseIntro(!useIntro)
+              }
+              } />
+          </View>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="End" style={{ backgroundColor: switchBtnColor(toEnd) }}
+              onPress={() => {
+                setToEnd(!toEnd)
+                player.end()
+              }} />
+          </View>
+        </View>
+
+        <View style={{ ...styles.rowContainer }}>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Var 1" style={{ backgroundColor: switchBtnColor(variation === 0) }}
+              onPress={() => setVariation(0)} />
+          </View>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Var 2" style={{ backgroundColor: switchBtnColor(variation === 1) }}
+              onPress={() => setVariation(1)} />
+          </View>
+        </View>
+
+        <View style={{ ...styles.rowContainer }}>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Fill 1" style={{ backgroundColor: switchBtnColor(fill1) }}
+              onPress={() => {
+                setFill1(!fill1)
+                player.fill(0)
+              }} />
+          </View>
+          <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Fill 2" style={{ backgroundColor: switchBtnColor(fill2) }}
+              onPress={() => {
+                setFill2(!fill2)
+                player.fill(1)
+              }} />
+          </View>
         </View>
       </View>
 
