@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, Button, StyleSheet, Clipboard } from 'react-native';
+import { Text, View, Button, StyleSheet } from 'react-native';
+import Clipboard from "@react-native-community/clipboard"
 import SwitchButton from './components/switchButton';
 import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR, EXAMPLE_LINK, WEBPAGE, SUPPORT_EMAIL } from './constants';
 import DocumentPicker from 'react-native-document-picker';
@@ -64,7 +65,7 @@ const RhythmiFixApp = () => {
           <View style={{ ...styles.buttonContainer }}>
             <SwitchButton title="Examples" onPress={() => {
               Clipboard.setString(EXAMPLE_LINK)
-              setStatus("Link to Google Drive with example rhythms copied to clipboard")
+              setStatus("Link to Google Drive copied to clipboard")
             }} />
           </View>
           <View style={{ ...styles.buttonContainer }}>
