@@ -219,10 +219,6 @@ class PatchSwitch {
                             default:
                                 console.log("NOTHING")
                         }
-
-                        TrackPlayer.getQueue().then((q) => {
-                            console.log(q.length)
-                        })
                     }
                 })
             })
