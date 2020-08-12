@@ -1,7 +1,7 @@
 import TrackPlayer from 'react-native-track-player';
 import { MIN_REQUEST_TIME, FILL_IDLE } from '../constants';
 import ExtractTracks from './trackManager';
-import {copyFile, DocumentDirectoryPath, unlink} from 'react-native-fs';
+import {copyFile, DocumentDirectoryPath, unlink, exists} from 'react-native-fs';
 
 // Declare some constants used for naming patches
 const PATCH1 = 'patch1'
@@ -95,6 +95,57 @@ class PatchSwitch {
         return Promise.resolve()
     }
 
+    checkRhythm() {
+        let status = this.uiprops.status.setter
+        const confirm = "Confirm that the file is given correctly in info.json"
+        if (this.tracks.intro.value !== '' && !exists(this.introTrack())) {
+            status("Invalid intro track. " + confirm)
+            return false
+        }
+
+        if (this.tracks.end.value !== '' && !exists(this.endTrack())) {
+            status("Invalid end track. " + confirm)
+            return false
+        }
+
+        if (!exists(this.mainTrack())) {
+            status("Cannot open main track. " + confirm)
+            return false
+        }
+
+        const f = this.tracks.folder
+        if (!exists(f + this.tracks.var1.main)) {
+            status("Cannot find main track for variation 1, which must be given.")
+            return false
+        }
+
+        if (!exists(f + this.tracks.var2.main)) {
+            status("Cannot find main track for variation 2. It must be given.")
+            return false
+        }
+
+        if (this.tracks.var1.fill1 !== '' && !exists(f + this.tracks.var1.fill1)) {
+            status("Invalid variation 1 fill 1 track. " + confirm)
+            return false
+        }
+
+        if (this.tracks.var1.fill2 !== '' && !exists(f + this.tracks.var1.fill2)) {
+            status("Invalid variation 1 fill 2 track. " + confirm)
+            return false
+        }
+
+        if (this.tracks.var2.fill1 !== '' && !exists(f + this.tracks.var2.fill1)) {
+            status("Invalid variation 2 fill 1 track. " + confirm)
+            return falses
+        }
+
+        if (this.tracks.var2.fill2 !== '' && !exists(f + this.tracks.var2.fill2)) {
+            status("Invalid variation 2 fill 2 track. " + confirm)
+            return false
+        }
+        return true
+    }
+
 
     async start() {
         try {
@@ -102,7 +153,12 @@ class PatchSwitch {
                 await this.loadRythm()
             }
         } catch (err) {
-            this.uiprops.status.setter("Could not load rythm")
+            this.uiprops.status.setter("Could not load rythm. Either the zip file is not valid or info.json could not be parsed.")
+            this.stop()
+            return
+        }
+
+        if (!this.checkRhythm()) {
             this.stop()
             return
         }
