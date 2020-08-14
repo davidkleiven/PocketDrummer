@@ -245,6 +245,10 @@ class PatchSwitch {
             return
         }
 
+        if (this.tracks === null) {
+            return
+        }
+
         console.log("NOT HAS FILL", !this.hasFill(fillNo))
         if (!this.hasFill(fillNo)) {
             setter = this.fillSetter(fillNo)
@@ -260,6 +264,9 @@ class PatchSwitch {
     }
 
     async end() {
+        if (this.tracks === null) {
+            return
+        }
 
         if (!this.hasEnd()) {
             this.uiprops.end.setter(0)
