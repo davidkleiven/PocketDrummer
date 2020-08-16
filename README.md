@@ -1,5 +1,7 @@
 # RhyhtmiFix
 
+<img src="assets/horizontal.jpg" width="600px"/>
+
 RhythmiFix is a sound track controller application. It supports gapless looping and is thus perfect to use as 
 a drum machine. The app supports
 
