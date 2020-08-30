@@ -56,7 +56,6 @@ const RhythmiFixApp = () => {
   player.uiprops.intro.value = useIntro
   player.uiprops.rythm.value = rythmFile
   player.uiprops.variation = variation
-  console.log("RYTHMFILE", rythmFile)
 
   return (
     <View style={{ ...styles.container }}>

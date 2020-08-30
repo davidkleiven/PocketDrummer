@@ -4,7 +4,6 @@ import {readFile, DocumentDirectoryPath, readDir, unlink} from 'react-native-fs'
 
 async function folderNames(folder) {
     const content = await readDir(folder)
-    console.log(content)
     let names = new Array()
     content.forEach((item, idx) => {
         if (item.isDirectory()) {
@@ -30,7 +29,6 @@ ExtractTracks = async (zipfile) => {
     
     infoPath = folder + '/info.json'
     content = await readFile(infoPath)
-    console.log(content)
     const data = JSON.parse(content).tracks
     data.folder = folder
     return data

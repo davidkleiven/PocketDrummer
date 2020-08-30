@@ -1,7 +1,7 @@
 import TrackPlayer from 'react-native-track-player';
 import { MIN_REQUEST_TIME, FILL_IDLE } from '../constants';
 import ExtractTracks from './trackManager';
-import {copyFile, DocumentDirectoryPath, unlink, exists} from 'react-native-fs';
+import { copyFile, DocumentDirectoryPath, unlink, exists } from 'react-native-fs';
 
 // Declare some constants used for naming patches
 const PATCH1 = 'patch1'
@@ -80,12 +80,13 @@ class PatchSwitch {
         const destination = DocumentDirectoryPath + '/activeRythm.zip'
         try {
             await unlink(destination)
-        } catch(err) {
+            await copyFile(uri, destination)
+            this.tracks = await ExtractTracks(destination)
+        } catch (err) {
             console.log(err)
+            this.status("Could not load file")
+            throw (err)
         }
-
-        await copyFile(uri, destination)
-        this.tracks = await ExtractTracks(destination)
     }
 
     async add(tr, insertBeforeId) {
@@ -93,6 +94,10 @@ class PatchSwitch {
             return TrackPlayer.add(tr, insertBeforeId)
         }
         return Promise.resolve()
+    }
+
+    status(msg) {
+        this.uiprops.status.setter(msg)
     }
 
     checkRhythm() {
@@ -153,7 +158,7 @@ class PatchSwitch {
                 await this.loadRythm()
             }
         } catch (err) {
-            this.uiprops.status.setter("Could not load rythm. Either the zip file is not valid or info.json could not be parsed.")
+            this.status("Could not load rythm. Either the zip file is not valid or info.json could not be parsed.")
             this.stop()
             return
         }
@@ -166,29 +171,39 @@ class PatchSwitch {
         TrackPlayer.setupPlayer().then(async () => {
 
             if (this.uiprops.intro.value && this.hasIntroTrack()) {
-                await this.add({
-                    id: INTRO,
-                    url: this.introTrack()
-                })
+                try {
+                    await this.add({
+                        id: INTRO,
+                        url: this.introTrack()
+                    })
+                } catch (err) {
+                    console.log(err)
+                    this.status("Could not add intro track")
+                    return
+                }
             }
 
-            // Adds a track to the queue
-            await this.add({
-                id: PATCH1,
-                url: this.mainTrack(),
-            })
+            try {
+                // Adds a track to the queue
+                await this.add({
+                    id: PATCH1,
+                    url: this.mainTrack(),
+                })
 
-            await this.add({
-                id: PATCH2,
-                url: this.mainTrack()
-            });
+                await this.add({
+                    id: PATCH2,
+                    url: this.mainTrack()
+                });
+            } catch (err) {
+                console.log(err)
+                this.status("Could not add main track")
+                return
+            }
+            
 
             this.playbackChangedSubsciption = TrackPlayer.addEventListener("playback-track-changed", (data) => {
                 TrackPlayer.getTrack(data.track).then(async (tr) => {
-
                     if (tr !== null) {
-                        console.log(tr.id)
-
                         switch (tr.id) {
                             case PATCH1:
                             case PATCH2:
@@ -220,19 +235,32 @@ class PatchSwitch {
                                 console.log("NOTHING")
                         }
                     }
+                }).catch((err) => {
+                    console.log(err)
+                    this.status("Error when handling playback changed")
                 })
             })
 
-            await TrackPlayer.play();
+            try {
+                await TrackPlayer.play();
+            } catch (err) {
+                console.log(err)
+                this.status("Could not start track")
+            }
         });
     }
 
     async stop() {
-        await TrackPlayer.stop()
+        try {
+            await TrackPlayer.stop()
+        } catch (err) {
+            console.log(err)
+            this.status("Could not stop TrackPlayer")
+        }
         if (this.playbackChangedSubsciption !== null) {
             this.playbackChangedSubsciption.remove()
         }
-        
+
         this.playbackChangedSubsciption = null
         this.endRequested = false
 
@@ -241,7 +269,7 @@ class PatchSwitch {
     }
 
     async fill(fillNo) {
-        if (this.fillInProgress){
+        if (this.fillInProgress) {
             return
         }
 
@@ -249,17 +277,22 @@ class PatchSwitch {
             return
         }
 
-        console.log("NOT HAS FILL", !this.hasFill(fillNo))
         if (!this.hasFill(fillNo)) {
             setter = this.fillSetter(fillNo)
             setter(FILL_IDLE)
             return
         }
 
-        await this.add({
-            id: fillNo === 0 ? FILL1 : FILL2,
-            url: this.fillTrack(fillNo),
-        })
+        try {
+            await this.add({
+                id: fillNo === 0 ? FILL1 : FILL2,
+                url: this.fillTrack(fillNo),
+            })
+        } catch (err) {
+            console.log(err)
+            this.status("Could not add fill")
+        }
+       
         this.fillInProgress = true
     }
 
@@ -272,12 +305,12 @@ class PatchSwitch {
             this.uiprops.end.setter(0)
             return
         }
-        
+
         const endTrack = {
             id: END,
             url: this.endTrack()
         }
-      
+
         this.add(endTrack)
         this.endRequested = true
     }
