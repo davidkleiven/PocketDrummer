@@ -21,6 +21,7 @@ ExtractTracks = async (zipfile) => {
     try {
         await unlink(folder)
     } catch(err) {
+        console.log("Error in ExtracTracks")
         console.log(err)
     }
 

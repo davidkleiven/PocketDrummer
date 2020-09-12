@@ -1,7 +1,7 @@
 import TrackPlayer from 'react-native-track-player';
 import { MIN_REQUEST_TIME, FILL_IDLE } from '../constants';
 import ExtractTracks from './trackManager';
-import { copyFile, DocumentDirectoryPath, unlink, exists } from 'react-native-fs';
+import { copyFile, DocumentDirectoryPath, unlink, exists, downloadFile } from 'react-native-fs';
 
 // Declare some constants used for naming patches
 const PATCH1 = 'patch1'
@@ -79,10 +79,23 @@ class PatchSwitch {
         const uri = this.uiprops.rythm.value.uri
         const destination = DocumentDirectoryPath + '/activeRythm.zip'
         try {
-            await unlink(destination)
-            await copyFile(uri, destination)
+            try{await unlink(destination)} catch (err) {console.log("unlink: ", err)}
+
+            if (String(uri).startsWith("http")) {
+                console.log("Downloading file...")
+                this.status("Downloading rhythm...")
+                downloadRes = await downloadFile({
+                    fromUrl: uri,
+                    toFile: destination
+                }).promise
+                this.status("Download finished. Playing...")
+                console.log(downloadRes)
+            } else {
+                await copyFile(uri, destination)
+            }
             this.tracks = await ExtractTracks(destination)
         } catch (err) {
+            console.log("Error in loadRhythm")
             console.log(err)
             this.status("Could not load file")
             throw (err)

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, View, Button, StyleSheet } from 'react-native';
 import Clipboard from "@react-native-community/clipboard"
 import SwitchButton from './components/switchButton';
-import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR, EXAMPLE_LINK, WEBPAGE, SUPPORT_EMAIL } from './constants';
+import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR, EXAMPLE_LINK, WEBPAGE, SUPPORT_EMAIL, DEMO_TRACK } from './constants';
 import DocumentPicker from 'react-native-document-picker';
 
 import PatchSwitch from './components/patchSwitcher';
@@ -61,6 +61,13 @@ const RhythmiFixApp = () => {
     <View style={{ ...styles.container }}>
       <View style={{ flex: 1 }}>
         <View style={{ ...styles.rowContainer }}>
+        <View style={{ ...styles.buttonContainer }}>
+            <SwitchButton title="Demo" onPress={() => {
+              Clipboard.setString(EXAMPLE_LINK)
+              setStatus("Demo track loaded")
+              setRythmFile({uri: DEMO_TRACK})
+            }} />
+          </View>
           <View style={{ ...styles.buttonContainer }}>
             <SwitchButton title="Examples" onPress={() => {
               Clipboard.setString(EXAMPLE_LINK)
