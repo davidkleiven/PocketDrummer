@@ -279,6 +279,7 @@ class PatchSwitch {
 
         this.uiprops.end.setter(0)
         this.uiprops.startStop.setter(0)
+        this.uiprops.setTimerOn(false)
     }
 
     async fill(fillNo) {

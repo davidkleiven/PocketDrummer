@@ -1,5 +1,6 @@
 export const HIGHLIGHT_COLOR = '#61892f'
 export const DEFAULT_BUTTON_COLOR = '#474b4f'
+export const TEXT_COLOR = '#86c232'
 
 // Fill button states
 export const FILL_IDLE = 0
