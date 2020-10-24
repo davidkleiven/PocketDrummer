@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, View, Button, StyleSheet } from 'react-native';
 import Clipboard from "@react-native-community/clipboard"
 import SwitchButton from './components/switchButton';
-import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR, EXAMPLE_LINK, WEBPAGE, SUPPORT_EMAIL, DEMO_TRACK } from './constants';
+import { HIGHLIGHT_COLOR, DEFAULT_BUTTON_COLOR, EXAMPLE_LINK, WEBPAGE, SUPPORT_EMAIL, DEMO_TRACK, TEXT_COLOR } from './constants';
 import DocumentPicker from 'react-native-document-picker';
 
 import PatchSwitch from './components/patchSwitcher';
+import StopWatch, {useTimer} from './components/stopwatch';
 
 function switchBtnColor(indicator) {
   return indicator ? HIGHLIGHT_COLOR : DEFAULT_BUTTON_COLOR
@@ -42,6 +43,7 @@ const RhythmiFixApp = () => {
   const [variation, setVariation] = useState(0);
   const [rythmFile, setRythmFile] = useState();
   const [status, setStatus] = useState("No file selected. Click on \"Select beat\" to open a track!")
+  const [seconds, setSeconds, setTimerOn] = useTimer()
   let [player, setPlayer] = useState(new PatchSwitch({
     fill1: { setter: setFill1, value: fill1 },
     fill2: { setter: setFill2, value: fill2 },
@@ -50,7 +52,8 @@ const RhythmiFixApp = () => {
     intro: { setter: setUseIntro, value: useIntro },
     rythm: { setter: null, value: rythmFile },
     status: { setter: setStatus, value: status },
-    variation: variation
+    variation: variation,
+    setTimerOn: setTimerOn
   }))
 
   player.uiprops.intro.value = useIntro
@@ -90,7 +93,14 @@ const RhythmiFixApp = () => {
       </View>
       <View style={{ flex: 10 }}>
         <View style={{ ...styles.rowContainer }}>
-          <Text style={{ color: '#86c232' }}>{status}</Text>
+          <View style={{flex: 1, flexDirection: "column"}}>
+            <View style={{flex: 1, marginLeft: 10, marginTop: 2}}>
+              <StopWatch seconds={seconds}/>
+            </View>
+            <View style={{flex: 10, justifyContent: "center", alignItems: "center"}}>
+              <Text style={{ color: TEXT_COLOR }}>{status}</Text>
+            </View>
+          </View>
         </View>
 
         <View style={{ ...styles.rowContainer }}>
@@ -102,9 +112,12 @@ const RhythmiFixApp = () => {
               isRunning(!beatIsRunning)
               if (!beatIsRunning) {
                 console.log("Playing song!")
+                setSeconds(0)
+                setTimerOn(true)
                 player.start()
 
               } else {
+                setTimerOn(false)
                 player.stop()
               }
             }} />

@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import { TEXT_COLOR } from '../constants';
 
 const SwitchButton = props => {
     return (
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     text: {
-        color: '#86c232'
+        color: TEXT_COLOR
     }
 }
 )
