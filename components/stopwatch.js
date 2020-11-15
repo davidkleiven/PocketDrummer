@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {TEXT_COLOR} from '../constants';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {TEXT_COLOR, DEFAULT_BUTTON_COLOR} from '../constants';
 
 let padToTwo = (number) => (number <= 9 ? `0${number}`:number);
 
@@ -14,7 +14,9 @@ function getRemainingSeconds(totalSeconds) {
 
 const StopWatch = props => {
     return (
-            <Text style={{...styles.text, ...props.style}}>{padToTwo(getMinutes(props.seconds)) + ':' + padToTwo(getRemainingSeconds(props.seconds))}</Text>
+        <TouchableOpacity onPress={props.onPress}>
+            <Text style={{color: props.textColor()}}>{padToTwo(getMinutes(props.seconds)) + ':' + padToTwo(getRemainingSeconds(props.seconds))}</Text>
+        </TouchableOpacity>
     )
 }
 
@@ -22,16 +24,29 @@ let timer = null
 export const useTimer = () => {
     const [seconds, setSeconds] = useState(0);
     const [timerOn, setTimerOn] = useState(false)
+    const [active, setTimerActive] = useState(true)
+
     useEffect(() => {
-        if (timerOn) {
+        if (timerOn && active) {
             timer = setInterval(() => {
                 setSeconds(seconds => seconds + 1);
-              }, 1000);
+                }, 1000);
 
         }
         return () => clearInterval(timer);
-      }, [timerOn]);
-    return [seconds, setSeconds, setTimerOn]
+        }, [timerOn]);
+
+    const stopWatchProps = {
+        onPress: () => {
+            setTimerActive(!active)
+            setTimerOn(false)
+        },
+        textColor: () => {
+            return active ? TEXT_COLOR : DEFAULT_BUTTON_COLOR
+        },
+        seconds: seconds
+    }
+    return [setSeconds, setTimerOn, stopWatchProps]
 }
 
 const styles = StyleSheet.create({

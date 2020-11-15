@@ -43,7 +43,7 @@ const RhythmiFixApp = () => {
   const [variation, setVariation] = useState(0);
   const [rythmFile, setRythmFile] = useState();
   const [status, setStatus] = useState("No file selected. Click on \"Select beat\" to open a track!")
-  const [seconds, setSeconds, setTimerOn] = useTimer()
+  const [setSeconds, setTimerOn, stopWatchProps] = useTimer()
   let [player, setPlayer] = useState(new PatchSwitch({
     fill1: { setter: setFill1, value: fill1 },
     fill2: { setter: setFill2, value: fill2 },
@@ -95,7 +95,8 @@ const RhythmiFixApp = () => {
         <View style={{ ...styles.rowContainer }}>
           <View style={{flex: 1, flexDirection: "column"}}>
             <View style={{flex: 1, marginLeft: 10, marginTop: 2}}>
-              <StopWatch seconds={seconds}/>
+              
+              <StopWatch seconds={stopWatchProps.seconds} onPress={stopWatchProps.onPress} textColor={stopWatchProps.textColor}/>
             </View>
             <View style={{flex: 10, justifyContent: "center", alignItems: "center"}}>
               <Text style={{ color: TEXT_COLOR }}>{status}</Text>
